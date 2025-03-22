@@ -15,7 +15,6 @@ room1 = room(10, 1)
 player = Player(70,70,"hero.jpg", 2, 315, 0)
 
 enemy = Enemy(70,70,"hero.jpg", 1, 205, 100, player.rect.x, player.rect.y)
-
 run = True
 while run:
 
