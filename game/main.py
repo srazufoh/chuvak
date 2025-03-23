@@ -2,9 +2,18 @@ import pygame
 import sys
 from pygame.locals import *
 from random import *
-from classes import *
-# Инициализация Pygame
+
+pygame.mixer.init()
 pygame.init()
+
+pygame.mixer.music.load("фоновямузыка.mp3")
+pygame.mixer.music.play()
+
+pygame.mixer.music.set_volume(0.5)
+
+money_sound = pygame.mixer.Sound('звукмонетки.mp3')
+
+money_sound.set_volume(1)
 
 # Настройки экрана
 WIDTH, HEIGHT = 1200, 800
@@ -44,7 +53,7 @@ class GameSprite(pygame.sprite.Sprite):
 
 class Enemy(GameSprite):
     def __init__(self, x, y):
-        super().__init__("hero.jpg", 70, 70, x, y, 1)
+        super().__init__("enemy.png", 70, 70, x, y, 1)
         self.add(enemies_group)
         self.target = None
 
@@ -61,8 +70,7 @@ class Enemy(GameSprite):
 class Wall(pygame.sprite.Sprite):
     def __init__(self, x, y, width, height):
         super().__init__()
-        self.image = pygame.Surface((width, height))
-        self.image.fill('darkgrey')
+        self.image = pygame.transform.scale(pygame.image.load('walls.png'), (width, height))
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
@@ -75,7 +83,7 @@ class Wall(pygame.sprite.Sprite):
             for col in range(8):
                 if randint(1, 3) < 2:
                     x = col * 150 + randint(20, 50)
-                    Wall(x, y, 50, 10)
+                    Wall(x, y, 70, 30)
 
         # Генерация вертикальных стен
         for col in range(10):
@@ -83,11 +91,11 @@ class Wall(pygame.sprite.Sprite):
             for row in range(6):
                 if randint(1, 3) < 2:
                     y = row * 120 + randint(20, 50)
-                    Wall(x, y, 10, 50)
+                    Wall(x, y, 30, 70)
 
 class Player(GameSprite):
     def __init__(self, x, y):
-        super().__init__("hero.jpg", 50, 50, x, y, 13)
+        super().__init__("hero.png", 50, 50, x, y, 13)
         self.last_position = (x, y)
 
     def update(self):
@@ -96,10 +104,14 @@ class Player(GameSprite):
 
         # Движение с учетом диагоналей
         dx, dy = 0, 0
-        if keys[pygame.K_w] and self.rect.y > 100: dy -= self.speed
-        if keys[pygame.K_s] and self.rect.y < 700: dy += self.speed
-        if keys[pygame.K_a] and self.rect.x > 100: dx -= self.speed
-        if keys[pygame.K_d] and self.rect.x < 1100: dx += self.speed
+        if keys[pygame.K_w] and self.rect.y > 100: 
+            dy -= self.speed
+        if keys[pygame.K_s] and self.rect.y < 700:
+            dy += self.speed
+        if keys[pygame.K_a] and self.rect.x > 100: 
+            dx -= self.speed
+        if keys[pygame.K_d] and self.rect.x < 1100:
+            dx += self.speed
 
         # Нормализация диагональной скорости
         if dx != 0 and dy != 0:
@@ -133,6 +145,7 @@ class Loot(GameSprite):
         # Проверка сбора игроком
         if pygame.sprite.spritecollide(self, [player], False):
             self.kill()
+            money_sound.play()
             all_sprites.empty()
             walls_group.empty()
             enemies_group.empty()
@@ -164,7 +177,7 @@ def draw_text(surf, text, size, x, y):
     text_rect.midtop = (x, y)
     surf.blit(text_surface, text_rect)
 
-background = pygame.image.load('image.jpeg')
+background = pygame.image.load('background.png')
 background = pygame.transform.scale(background, (WIDTH, HEIGHT)) 
 clock = pygame.time.Clock()
 game_init()
