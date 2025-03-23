@@ -132,6 +132,9 @@ class Player(GameSprite):
         # С коллизиями врагов
         if pygame.sprite.spritecollide(self, enemies_group, False):
             self.kill()
+            self.image = pygame.transform.scale(pygame.image.load('end.png'), (WIDTH, HEIGHT))
+            self.rect.x = 0
+            self.rect.y = 0
 
 
 
